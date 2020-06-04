@@ -216,8 +216,6 @@ Student* ADD(char* first1, char* last1, float gpa1){ //add function
 	}
 
 	pos = pos % tableSize;
-	//cout << tableSize << endl;
-	//cout << pos << endl;
 	newNode->student = newStudent;
 	newNode->index = pos;
 
@@ -555,29 +553,41 @@ int main(){
 		cin.get(input, 10);
 		cin.clear();
 		cin.ignore(999, '\n');
+		
 		if(strcmp(input, "add") == 0){
-			//cout << "Would you like to input by"
-			//char input2[10];
-			char file1[50];
-			char file2[50];
-			int number;
-			
-			cout << "\nEnter the filename containing first names: "; //prompt for input
-			cin.get(file1, 50);
+			cout << "Would you like to input manually or via file? Type 'manual' or 'file': "
+			char input2[10];
+			cin.get(input2, 10);
 			cin.clear();
-			cin.ignore(99999, '\n');
+			cin.ignore(999, '\n');
 			
-			cout << "Enter the filename containing last names: ";
-			cin.get(file2, 50);
-			cin.clear();
-			cin.ignore(99999, '\n');
+			if(strcmp(input2, 'manual') == 0){
+				
+			}
 			
-			cout << "How many students would you like to generate? ";
-			cin >> number;
-			cin.clear();
-			cin.ignore(99999, '\n');
+			else if(strcmp(input2, "file") == 0){
+				char file1[50];
+				char file2[50];
+				int number;
+				
+				cout << "\nEnter the filename containing first names: "; //prompt for input
+				cin.get(file1, 50);
+				cin.clear();
+				cin.ignore(99999, '\n');
+				
+				cout << "Enter the filename containing last names: ";
+				cin.get(file2, 50);
+				cin.clear();
+				cin.ignore(99999, '\n');
+				
+				cout << "How many students would you like to generate? ";
+				cin >> number;
+				cin.clear();
+				cin.ignore(99999, '\n');
+				
+				randomGen(file1, file2, number); //call random generator algorithm to create student w input
+			}
 			
-			randomGen(file1, file2, number); //call random generator algorithm to create student w input
 			
 			cout << endl;
 		}
