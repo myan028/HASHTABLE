@@ -273,7 +273,8 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 	ifstream file;
 
 	//open inputted txt files for first and last name
-	file.open(first);
+	//first name txt
+	file.open(first); //opening first name
 	if(file){
 		int i = 0;
 		while(!file.eof()){
@@ -282,13 +283,15 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 		}
 		input[i - 1] = '\0';
 	}
-	else{
-		cout << "Could not open " << first << endl;
+	else{ 
+		cout << "Could not open " << first << "." << endl; 
 		return;
 	}
 	parseInput(firstNames, input);
 	file.close();
 
+	
+	//last name txt
 	file.open(last);
 	if(file){
 		int i = 0;
@@ -299,7 +302,7 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 		input[i - 1] = '\0';
 	}
 	else{
-		cout << "There is an error opening: " << last << endl;
+		cout << "Could not open " << last << "." << endl;
 		return;
 	}
 	
@@ -377,9 +380,10 @@ void PRINT(vector<Student*> students){ //print function
 			if(HashTable[i]->student != NULL){
 				counter++;
 				
-				cout << endl << HashTable[i]->student->firstName << " " << HashTable[i]->student->lastName << endl;
+				cout << endl << "Name: "  << HashTable[i]->student->firstName << " " << HashTable[i]->student->lastName << endl;
 				
-				cout << setw(6) << setfill('0') << HashTable[i]->student->id << endl;
+				cout << "ID: " << setw(6) << setfill('0') << HashTable[i]->student->id << endl;
+				cout << "GPA: ";
 				printf("%.2f\n", HashTable[i]->student->gpa); //
 				cout << "Index: " << HashTable[i]->index << " (Chain: 0)" << endl;
 			}
@@ -391,9 +395,10 @@ void PRINT(vector<Student*> students){ //print function
 				if(current->student != NULL){
 					counter++;
 					
-					cout << endl << current->student->firstName << " " << current->student->lastName << endl;
+					cout << endl << "Name: " << current->student->firstName << " " << current->student->lastName << endl;
 					
 					cout << "ID: " << setw(6) << setfill('0') << HashTable[i]->student->id << endl;
+					cout << "GPA: ";
 					printf("%.2f\n", current->student->gpa);
 					cout << "Index: " << current->index << " (Chain: " << num << ")" << endl;
 				}
@@ -434,7 +439,104 @@ void DELETE(int index){ //delete function
 	  }
 	}*/
 	
-	//old algorithm
+	if(HashTable[index]->next == NULL){ //found student
+		char yesno = '\0';
+		cout << "\nAre you sure you would like to delete this student? Type 'y' or 'n': ";
+		cin >> yesno;
+		cin.clear();
+		cin.ignore(1000000, '\n');
+
+		if(yesno == 'y'){
+			checkCombos(HashTable[index]->student->firstName, HashTable[index]->student->lastName, true);
+			delete HashTable[index];
+			HashTable[index] = NULL;
+			
+			cout << "\nStudent has been deleted.\n" << endl;
+			return;
+		}
+		
+		else if(yesno == 'n'){
+			cout << "\nStudent was not deleted.\n" << endl;
+			return;
+		}
+		
+		else{
+			cout << "\nInvalid Input." << endl;
+			return;
+		}
+	}
+
+	else{ //if index has multiple students sharing
+		int chainNo = 0;
+		char yesno = '\0';
+		
+		cout << "\nEnter the student's chain number: ";
+		cin >> chainNo;
+		cin.clear();
+		cin.ignore(1000000, '\n');
+
+		Node* current = HashTable[index];
+		Node* parent;
+		int counter;
+		
+		
+		while(counter != chainNo){
+			if(current->next != NULL){
+				parent = current;
+				current = current->next;
+			}
+			else{
+				cout << "\nStudent not found. " << endl; //no student found
+				return;
+			}
+			counter++; //increase count each time
+			cout << endl << counter << endl;
+		}
+
+		cout << endl << "Name: " << current->student->firstName << " " << current->student->lastName << endl;		
+		cout << "ID: " << setw(6) << setfill('0') << current->student->id << endl;
+		cout << "GPA: ";
+		printf("%.2f\n", current->student->gpa);
+
+		cout << "\nAre you sure you would like to delete this student? Type 'y' or 'n': ";
+		cin >> yesno;
+		cin.clear();
+		cin.ignore(1000000, '\n');
+		
+		if(yesno == 'y'){ 
+			if(current->next == NULL){
+				checkCombos(current->student->firstName, current->student->lastName, true);
+				parent->next = NULL;
+				current = NULL;
+				delete current;
+				cout << "Student has been deleted.\n" << endl;
+			}
+			else{ //case
+				Node* temp = current->next;
+				if(current == HashTable[index]){
+					HashTable[index] = temp;
+				}
+				if(parent != NULL)
+				parent->next = temp;
+
+				checkCombos(current->student->firstName, current->student->lastName, true);
+				
+				current = NULL;
+				delete current;
+				
+				cout << "\nStudent has been deleted.\n" << endl;
+				return;
+			}
+		}
+		else if(yesno == 'n'){ //dont want to delete
+			cout << "\nStudent was not deleted.\n" << endl;
+			return;
+		}
+		else{ //neither y or n
+			cout << "\nPlease type 'y' or 'n'.\n" << endl;
+			return;
+		}
+	}
 	
 }
 
@@ -498,7 +600,45 @@ int main(){
 		}
 		
 		else if(strcmp(input, "delete") == 0){
-			//in
+			char* name = new char[nameSize];
+			int index;
+			cout << "Enter the student's index: ";
+			cin >> index;
+			cin.clear();
+			cin.ignore(1000000, '\n');
+
+			bool found = false;
+			if(HashTable[index] != NULL){ //print students with matching index for deletion
+				cout << endl << "Name: " << HashTable[index]->student->firstName << " " << HashTable[index]->student->lastName << endl;
+				cout << "ID: " << setw(6) << setfill('0') << HashTable[index]->student->id << endl;
+				cout << "GPA: ";
+				printf("%.2f\n", HashTable[index]->student->gpa);
+				if(HashTable[index]->next != NULL){
+					cout << "Chain: " << "0" << endl; //0 case
+				}
+				
+				Node* current = HashTable[index];
+				int num = 0;
+				while(current->next != NULL){
+					current = current->next;
+					num++;
+					if(current->student != NULL){
+						cout << endl << "Name: " << current->student->firstName << " " << current->student->lastName << endl;
+						cout << "ID: " << setw(6) << setfill('0') << current->student->id << endl;
+						cout << "GPA: ";
+						printf("%.2f\n", current->student->gpa);
+						cout << "Chain: " << num << endl;
+					}
+				}
+				found = true;
+			}
+			if(!found){
+				cout << "Student not found." << endl;
+			}
+			
+			else{
+				DELETE(index); //call delete
+			}
 		
 		}
 		
