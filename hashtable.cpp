@@ -5,49 +5,33 @@
 #include <cmath>
 #include <map>
 #include <fstream>
-
-
 using namespace std;
-
 /*
 Code by Michael Yan 5/28/20
 Part 2 to StudentList, this is a program that allows the user to randomly generate students in a
 database and store them via hash table.
 */
-
 struct Student{ //struct including student info
   char* firstName;
   char* lastName;
   int id;
   float gpa;
 };
-
-
 struct Node{ //linkedlist for chaining
 	Student* student;
 	Node* next;
 	int index;
 };
-
-
-
 int tableSize = 10;
-
 Node** HashTable = new Node*[tableSize];
-
 vector<int> usedIDs;
 vector<map<char*, char*>> usedNames;
 int nameSize = 20;
-
-
 void initTable(Node** table, int size){
 	for(int i = 0; i < size; i++){
 		table[i] = NULL;
 	}
 }
-
-
-
 bool checkTable(bool forced){
 	if(forced){
 		return true;
@@ -59,9 +43,6 @@ bool checkTable(bool forced){
 		return false;
 	}
 }
-
-
-
 void rehash(bool forced){ //rehash table, increase size
 	while(checkTable(forced)){ //reindex nodes
 		forced = false;
@@ -106,7 +87,6 @@ void rehash(bool forced){ //rehash table, increase size
 							}
 						}
 						pos = pos % tableSize;
-
 						if(pos != parent->index){
 							Node* temp = current;
 							temp->index = pos;
@@ -121,7 +101,6 @@ void rehash(bool forced){ //rehash table, increase size
 								Node* occupier = HashTable[pos];
 								while(occupier->next != NULL)
 								occupier = occupier->next;
-
 								occupier->next = temp;
 							}
 						}
@@ -137,8 +116,6 @@ void rehash(bool forced){ //rehash table, increase size
 		
 	}
 }
-
-
 int generateID(){ //generate a random ID that hasa does not exist yet
 	int randomID;
 	while(true){
@@ -158,8 +135,6 @@ int generateID(){ //generate a random ID that hasa does not exist yet
 	usedIDs.push_back(randomID);
 	return randomID;
 }
-
-
 bool checkCombos(char* first, char* last, bool shouldDelete){ //check first and last combinations if name has been used
 	vector<map<char*, char*>>::iterator v;
 	map<char*, char*>::const_iterator j;
@@ -177,13 +152,9 @@ bool checkCombos(char* first, char* last, bool shouldDelete){ //check first and 
 	}
 	return true;
 }
-
-
-
 Student* ADD(char* first1, char* last1, float gpa1){ //add function
 	Student* newStudent = new Student(); //store the new student in heap
 	Node* newNode = new Node();
-
 	/*cout << "\nEnter the student's first name: ";
 	cin >> newStudent->firstName;
 	cin.clear(); //clear for next input (many)
@@ -201,14 +172,11 @@ Student* ADD(char* first1, char* last1, float gpa1){ //add function
 	cin.clear();
 	cin.ignore(999, '\n');
 	return newStudent; //return student pointer*/
-
 	newStudent->id = generateID();  
 	newStudent->firstName = first1;
 	newStudent->lastName = last1;
 	newStudent->gpa = gpa1;
-
 	int pos = 0;
-
 	for(int i = 0; i < nameSize; i++){
 		if(newStudent->firstName[i] != '\0'){
 			pos += (int)newStudent->firstName[i];
@@ -216,6 +184,8 @@ Student* ADD(char* first1, char* last1, float gpa1){ //add function
 	}
 
 	pos = pos % tableSize;
+	//cout << tableSize << endl;
+	//cout << pos << endl;
 	newNode->student = newStudent;
 	newNode->index = pos;
 
@@ -226,21 +196,15 @@ Student* ADD(char* first1, char* last1, float gpa1){ //add function
 		Node* current = HashTable[pos];
 		while(current->next != NULL)
 		current = current->next;
-
 		current->next = newNode;
 	}
-
 	map<char*, char*> temp;
 	temp.insert(pair<char*, char*> (first1, last1));
 	usedNames.push_back(temp);
 	temp.clear();
-
 	rehash(false);
   
 }
-
-
-
 void parseInput(vector<char*> &names, char* input){ //parse the txt fileinput
 	char* name = new char[nameSize];
 	int i = 0;
@@ -262,19 +226,13 @@ void parseInput(vector<char*> &names, char* input){ //parse the txt fileinput
 	}
 	names.push_back(name); //add name
 }
-
-
-
-
 void randomGen(char first[], char last[], int amount){ //algorithm taking file input
 	vector<char*> firstNames;
 	vector<char*> lastNames;
 	char* input = new char[10000];
 	ifstream file;
-
 	//open inputted txt files for first and last name
-	//first name txt
-	file.open(first); //opening first name
+	file.open(first);
 	if(file){
 		int i = 0;
 		while(!file.eof()){
@@ -283,15 +241,12 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 		}
 		input[i - 1] = '\0';
 	}
-	else{ 
-		cout << "Could not open " << first << "." << endl; 
+	else{
+		cout << "There is an error opening: " << first << endl;
 		return;
 	}
 	parseInput(firstNames, input);
 	file.close();
-
-	
-	//last name txt
 	file.open(last);
 	if(file){
 		int i = 0;
@@ -302,7 +257,7 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 		input[i - 1] = '\0';
 	}
 	else{
-		cout << "Could not open " << last << "." << endl;
+		cout << "There is an error opening: " << last << endl;
 		return;
 	}
 	
@@ -324,12 +279,10 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 			z++;
 		}
 	}
-
 	if(amount > combos.size()){
 		cout << "Maximum amount of random students is: " << combos.size() << endl; //max size reached
 		return;
 	}
-
 	for(int i = 0; i < amount; i++){ //selecting unused combination
 		char* firstName = new char[nameSize];
 		char* lastName = new char[nameSize];
@@ -357,11 +310,6 @@ void randomGen(char first[], char last[], int amount){ //algorithm taking file i
 	}
  
 }
-
-
-
-
-
 void PRINT(vector<Student*> students){ //print function
 	/*vector<Student*>::iterator cycle; // creates iterator through student pointer vector
 	for(cycle = students.begin(); cycle != students.end(); ++cycle){ //iterates through the vector
@@ -385,7 +333,8 @@ void PRINT(vector<Student*> students){ //print function
 				cout << "ID: " << setw(6) << setfill('0') << HashTable[i]->student->id << endl;
 				cout << "GPA: ";
 				printf("%.2f\n", HashTable[i]->student->gpa); //
-				cout << "Index: " << HashTable[i]->index << " (Chain: 0)" << endl;
+				//cout << "Index: " << HashTable[i]->index << " (Chain: 0)" << endl;
+				cout << "Index: " << HashTable[i]->index << " (Chain: 1)" << endl;
 			}
 			current = HashTable[i];
 			int num = 0;
@@ -400,7 +349,7 @@ void PRINT(vector<Student*> students){ //print function
 					cout << "ID: " << setw(6) << setfill('0') << HashTable[i]->student->id << endl;
 					cout << "GPA: ";
 					printf("%.2f\n", current->student->gpa);
-					cout << "Index: " << current->index << " (Chain: " << num << ")" << endl;
+					cout << "Index: " << current->index << " (Chain: " << num+1 << ")" << endl;
 				}
 			}
 		}
@@ -408,17 +357,12 @@ void PRINT(vector<Student*> students){ //print function
 	if(!found){ //if nothing in database
 		cout << "There are no students to print." << endl;
 	}
-
 	else{
 		cout << endl << counter << " students in database.\n" << endl;
 	}
-
 	//cout << usedNames.size();
   
 }
-
-
-
 void DELETE(int index){ //delete function
     /*int idInput;
 	cout << "\nWhich student would you like to delete? Enter their student id: ";
@@ -445,7 +389,6 @@ void DELETE(int index){ //delete function
 		cin >> yesno;
 		cin.clear();
 		cin.ignore(1000000, '\n');
-
 		if(yesno == 'y'){
 			checkCombos(HashTable[index]->student->firstName, HashTable[index]->student->lastName, true);
 			delete HashTable[index];
@@ -465,7 +408,6 @@ void DELETE(int index){ //delete function
 			return;
 		}
 	}
-
 	else{ //if index has multiple students sharing
 		int chainNo = 0;
 		char yesno = '\0';
@@ -474,7 +416,7 @@ void DELETE(int index){ //delete function
 		cin >> chainNo;
 		cin.clear();
 		cin.ignore(1000000, '\n');
-
+		//index--;
 		Node* current = HashTable[index];
 		Node* parent;
 		int counter;
@@ -492,12 +434,10 @@ void DELETE(int index){ //delete function
 			counter++; //increase count each time
 			cout << endl << counter << endl;
 		}
-
 		cout << endl << "Name: " << current->student->firstName << " " << current->student->lastName << endl;		
 		cout << "ID: " << setw(6) << setfill('0') << current->student->id << endl;
 		cout << "GPA: ";
 		printf("%.2f\n", current->student->gpa);
-
 		cout << "\nAre you sure you would like to delete this student? Type 'y' or 'n': ";
 		cin >> yesno;
 		cin.clear();
@@ -516,9 +456,9 @@ void DELETE(int index){ //delete function
 				if(current == HashTable[index]){
 					HashTable[index] = temp;
 				}
-				if(parent != NULL)
-				parent->next = temp;
-
+				if(parent != NULL){
+					parent->next = temp;
+				}
 				checkCombos(current->student->firstName, current->student->lastName, true);
 				
 				current = NULL;
@@ -539,9 +479,6 @@ void DELETE(int index){ //delete function
 	}
 	
 }
-
-
-
 int main(){
 	srand(time(0));
 	initTable(HashTable, tableSize);
@@ -556,42 +493,31 @@ int main(){
 		cin.get(input, 10);
 		cin.clear();
 		cin.ignore(999, '\n');
-		
+
 		if(strcmp(input, "add") == 0){
-			cout << "Would you like to input manually or via file? Type 'manual' or 'file': "
-			char input2[10];
-			cin.get(input2, 10);
+			//cout << "Would you like to input by"
+			//char input2[10];
+			char file1[50];
+			char file2[50];
+			int number;
+
+			cout << "\nEnter the filename containing first names: "; //prompt for input
+			cin.get(file1, 50);
 			cin.clear();
-			cin.ignore(999, '\n');
-			
-			if(strcmp(input2, 'manual') == 0){
-				
-			}
-			
-			else if(strcmp(input2, "file") == 0){
-				char file1[50];
-				char file2[50];
-				int number;
-				
-				cout << "\nEnter the filename containing first names: "; //prompt for input
-				cin.get(file1, 50);
-				cin.clear();
-				cin.ignore(99999, '\n');
-				
-				cout << "Enter the filename containing last names: ";
-				cin.get(file2, 50);
-				cin.clear();
-				cin.ignore(99999, '\n');
-				
-				cout << "How many students would you like to generate? ";
-				cin >> number;
-				cin.clear();
-				cin.ignore(99999, '\n');
-				
-				randomGen(file1, file2, number); //call random generator algorithm to create student w input
-			}
-			
-			
+			cin.ignore(99999, '\n');
+
+			cout << "Enter the filename containing last names: ";
+			cin.get(file2, 50);
+			cin.clear();
+			cin.ignore(99999, '\n');
+
+			cout << "How many students would you like to generate? ";
+			cin >> number;
+			cin.clear();
+			cin.ignore(99999, '\n');
+
+			randomGen(file1, file2, number); //call random generator algorithm to create student w input
+
 			cout << endl;
 		}
 		
@@ -606,7 +532,6 @@ int main(){
 			cin >> index;
 			cin.clear();
 			cin.ignore(1000000, '\n');
-
 			bool found = false;
 			if(HashTable[index] != NULL){ //print students with matching index for deletion
 				cout << endl << "Name: " << HashTable[index]->student->firstName << " " << HashTable[index]->student->lastName << endl;
@@ -614,7 +539,8 @@ int main(){
 				cout << "GPA: ";
 				printf("%.2f\n", HashTable[index]->student->gpa);
 				if(HashTable[index]->next != NULL){
-					cout << "Chain: " << "0" << endl; //0 case
+					//cout << "Chain: " << "0" << endl; //0 case
+					cout << "Chain: " << "1" << endl; //0 case
 				}
 				
 				Node* current = HashTable[index];
@@ -627,7 +553,7 @@ int main(){
 						cout << "ID: " << setw(6) << setfill('0') << current->student->id << endl;
 						cout << "GPA: ";
 						printf("%.2f\n", current->student->gpa);
-						cout << "Chain: " << num << endl;
+						cout << "Chain: " << num+1 << endl;
 					}
 				}
 				found = true;
